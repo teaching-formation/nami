@@ -506,6 +506,16 @@ export default function Dashboard() {
                   </tbody>
                 </table>
               </div>
+              <div className="no-print" style={{ borderTop: '1px solid rgba(0,0,0,0.06)', marginTop: 4 }}>
+                <button
+                  onClick={openAdd}
+                  style={{ width: '100%', padding: '11px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6b6b68', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: '0 0 10px 10px', transition: 'background .15s, color .15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#f5f5f4'; (e.currentTarget as HTMLButtonElement).style.color = cfg.color; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = ''; (e.currentTarget as HTMLButtonElement).style.color = '#6b6b68'; }}
+                >
+                  <span style={{ fontSize: 16, fontWeight: 400, lineHeight: 1 }}>+</span> Ajouter une activité
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -688,19 +698,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* FAB + */}
-      {!loading && allData.length > 0 && (
-        <button
-          className="no-print"
-          onClick={openAdd}
-          title="Ajouter une activité"
-          style={{ position: 'fixed', bottom: 28, right: 28, width: 52, height: 52, borderRadius: '50%', background: cfg.color, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 26, fontWeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.22)', zIndex: 50, transition: 'transform .15s, box-shadow .15s', lineHeight: 1 }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.28)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.22)'; }}
-        >
-          +
-        </button>
-      )}
 
       {/* TOAST */}
       {toast && (
