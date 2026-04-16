@@ -297,9 +297,14 @@ export default function Dashboard() {
 
       {/* ── HEADER ── */}
       <header className="db-header">
-        <div>
-          <div className="db-header-title">Cabinet DG — ANSUT</div>
-          <div className="db-header-sub">Suivi des activités</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-ansut.webp" alt="ANSUT" style={{ height: 36, width: 'auto', objectFit: 'contain', display: 'block' }} />
+          <div style={{ width: 1, height: 28, background: 'var(--border2)', flexShrink: 0 }} />
+          <div>
+            <div className="db-header-title">Cabinet DG</div>
+            <div className="db-header-sub">Suivi des activités</div>
+          </div>
         </div>
         <div className="db-header-actions no-print">
           <button className="dark-toggle" onClick={toggleDark} title={darkMode ? 'Mode clair' : 'Mode sombre'}>
