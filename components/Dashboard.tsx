@@ -303,12 +303,12 @@ export default function Dashboard() {
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f4' }}>
       {/* HEADER */}
-      <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 20 }}>
+      <header className="db-header">
         <div>
           <h1 style={{ fontSize: 17, fontWeight: 600 }}>Tableau de bord — Cabinet DG</h1>
           <p style={{ fontSize: 12, color: '#6b6b68', marginTop: 2 }}>Suivi des activités · ANSUT</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <div className="db-header-actions">
           {/* Indicateur connexion */}
           <span style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 20, background: connected === true ? '#EAF3DE' : connected === false ? '#FAEEDA' : '#F1EFE8', color: connected === true ? '#3B6D11' : connected === false ? '#854F0B' : '#6b6b68', fontWeight: 500 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: connected === true ? '#639922' : connected === false ? '#c0392b' : '#aaa', display: 'inline-block' }} />
@@ -324,7 +324,7 @@ export default function Dashboard() {
       </header>
 
       {/* ONGLETS */}
-      <div style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '0 24px', display: 'flex', gap: 4, position: 'sticky', top: 57, zIndex: 19, overflowX: 'auto' }}>
+      <div className="dept-tabs" style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '0 24px', display: 'flex', gap: 4, position: 'sticky', top: 57, zIndex: 19, overflowX: 'auto' }}>
         {depts.map(dept => {
           const dc = DEPT_CONFIG[dept] || { color: '#378ADD', light: '#E6F1FB' };
           const isActive = dept === currentDept;
@@ -338,7 +338,7 @@ export default function Dashboard() {
       </div>
 
       {/* MAIN */}
-      <main style={{ maxWidth: 1040, margin: '0 auto', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <main className="db-main">
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60, color: '#6b6b68', fontSize: 14 }}>Chargement…</div>
         ) : allData.length === 0 ? (
@@ -361,7 +361,7 @@ export default function Dashboard() {
             </div>
 
             {/* KPIs */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+            <div className="kpi-grid">
               <KpiCard bg="#EEEDFE" iconColor="#3C3489" label="Total activités" value={total} sub={`${pct(clos)}% clôturées`} icon="📋" />
               <KpiCard bg="#EAF3DE" iconColor="#3B6D11" label="Clôturées" value={clos} sub={`${pct(clos)}% du total`} valueColor="#3B6D11" icon="✓" />
               <KpiCard bg="#E6F1FB" iconColor="#185FA5" label="En cours" value={ec} sub={`${pct(ec)}% du total`} valueColor="#185FA5" icon="↻" />
@@ -369,7 +369,7 @@ export default function Dashboard() {
             </div>
 
             {/* MID ROW */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
+            <div className="mid-row">
               {/* DONUT */}
               <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '18px 20px' }}>
                 <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Répartition par statut</div>
@@ -442,7 +442,7 @@ export default function Dashboard() {
             {/* TABLE */}
             <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '18px 20px' }}>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Détail des activités</div>
-              <div style={{ overflowX: 'auto' }}>
+              <div className="db-table-wrap">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr>
@@ -591,7 +591,7 @@ export default function Dashboard() {
       {commentModal.open && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'stretch', justifyContent: 'flex-end' }}
           onClick={e => { if (e.target === e.currentTarget) setCommentModal({ open: false, comments: [] }); }}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: 440, display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)', animation: 'slideIn .2s ease' }}>
+          <div className="comment-panel">
             {/* Header */}
             <div style={{ padding: '18px 20px', borderBottom: '1px solid rgba(0,0,0,0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
               <div>
@@ -678,12 +678,12 @@ function KpiCard({ bg, iconColor, label, value, sub, valueColor, icon }: {
   bg: string; iconColor: string; label: string; value: number; sub: string; valueColor?: string; icon: string;
 }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '16px 18px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-      <div style={{ width: 38, height: 38, borderRadius: 6, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>{icon}</div>
-      <div>
-        <div style={{ fontSize: 12, color: '#6b6b68', marginBottom: 4 }}>{label}</div>
-        <div style={{ fontSize: 26, fontWeight: 600, lineHeight: 1, color: valueColor }}>{value}</div>
-        <div style={{ fontSize: 11, color: '#a0a09c', marginTop: 3 }}>{sub}</div>
+    <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: 10 }} className="kpi-card-inner">
+      <div style={{ width: 34, height: 34, borderRadius: 6, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>{icon}</div>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 11, color: '#6b6b68', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        <div className="kpi-value" style={{ fontSize: 24, fontWeight: 600, lineHeight: 1, color: valueColor }}>{value}</div>
+        <div style={{ fontSize: 10, color: '#a0a09c', marginTop: 2 }}>{sub}</div>
       </div>
     </div>
   );
