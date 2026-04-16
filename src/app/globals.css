@@ -105,6 +105,24 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
   .dept-tabs::-webkit-scrollbar { display:none; }
 }
 
+/* ── PRINT / PDF ── */
+@media print {
+  .no-print { display: none !important; }
+  .db-header { position: static !important; box-shadow: none !important; border-bottom: 1px solid #ddd !important; }
+  .dept-tabs  { position: static !important; box-shadow: none !important; }
+  .db-main    { padding: 12px 0 !important; }
+  .mid-row    { grid-template-columns: 1fr 2fr !important; }
+  .kpi-grid   { grid-template-columns: repeat(4,1fr) !important; }
+  body        { background: #fff !important; }
+  .comment-panel, #toast { display: none !important; }
+  /* Éviter les coupures de page dans les cartes */
+  .kpi-grid > *, .mid-row > *, .db-main > * { break-inside: avoid; }
+  /* Masquer les colonnes actions dans le tableau */
+  td:last-child, th:last-child,
+  td:nth-last-child(2), th:nth-last-child(2) { display: none !important; }
+  @page { margin: 1.5cm; size: A4 landscape; }
+}
+
 /* ── TRÈS PETIT ≤ 400px ── */
 @media (max-width:400px) {
   .kpi-grid {

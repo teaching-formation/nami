@@ -61,6 +61,7 @@ export default function Dashboard() {
   const [currentDept, setCurrentDept] = useState<string>('');
   const [filterStatut, setFilterStatut] = useState('all');
   const [filterResp, setFilterResp] = useState('all');
+  const [filterSearch, setFilterSearch] = useState('');
   const [connected, setConnected] = useState<boolean | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -132,9 +133,11 @@ export default function Dashboard() {
   const depts = Array.from(new Set(allData.map(r => r.departement))).filter(Boolean);
 
   const deptData = allData.filter(r => r.departement === currentDept);
+  const searchLower = filterSearch.toLowerCase();
   const filtered = deptData.filter(r =>
     (filterStatut === 'all' || (r.statut || '') === filterStatut) &&
-    (filterResp === 'all' || r.responsable === filterResp)
+    (filterResp === 'all' || r.responsable === filterResp) &&
+    (!filterSearch || [r.numero, r.rubrique, r.activite, r.responsable].some(v => (v || '').toLowerCase().includes(searchLower)))
   );
   const resps = Array.from(new Set(deptData.map(r => r.responsable))).filter(Boolean);
 
@@ -314,10 +317,13 @@ export default function Dashboard() {
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: connected === true ? '#639922' : connected === false ? '#c0392b' : '#aaa', display: 'inline-block' }} />
             {connected === true ? 'Connecté' : connected === false ? 'Erreur' : 'Connexion…'}
           </span>
-          <button onClick={openAdd} style={{ fontSize: 12, padding: '7px 13px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#1a6fbd', color: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <button onClick={() => window.print()} className="no-print" style={{ fontSize: 12, padding: '7px 13px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#fff', color: '#6b6b68', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            ⬇ Export PDF
+          </button>
+          <button onClick={openAdd} className="no-print" style={{ fontSize: 12, padding: '7px 13px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#1a6fbd', color: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             + Ajouter
           </button>
-          <button onClick={() => setImportModal(true)} style={{ fontSize: 12, padding: '7px 13px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#f0a500', color: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <button onClick={() => setImportModal(true)} className="no-print" style={{ fontSize: 12, padding: '7px 13px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#f0a500', color: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             ↑ Import Excel
           </button>
         </div>
@@ -349,7 +355,20 @@ export default function Dashboard() {
         ) : (
           <>
             {/* FILTRES */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }} className="no-print">
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <span style={{ position: 'absolute', left: 10, fontSize: 13, color: '#a0a09c', pointerEvents: 'none' }}>🔍</span>
+                <input
+                  type="text"
+                  placeholder="Rechercher…"
+                  value={filterSearch}
+                  onChange={e => setFilterSearch(e.target.value)}
+                  style={{ fontSize: 13, padding: '7px 10px 7px 30px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.14)', background: '#fff', color: '#1a1a19', outline: 'none', width: 180 }}
+                />
+                {filterSearch && (
+                  <button onClick={() => setFilterSearch('')} style={{ position: 'absolute', right: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#a0a09c', lineHeight: 1, padding: 0 }}>×</button>
+                )}
+              </div>
               <SelectFilter value={filterStatut} onChange={v => { setFilterStatut(v); setFilterResp('all'); }}>
                 <option value="all">Tous les statuts</option>
                 {STATUTS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -358,6 +377,11 @@ export default function Dashboard() {
                 <option value="all">Tous les responsables</option>
                 {Array.from(new Set(deptData.map(r => r.responsable))).filter(Boolean).sort().map(r => <option key={r} value={r}>{r}</option>)}
               </SelectFilter>
+              {(filterSearch || filterStatut !== 'all' || filterResp !== 'all') && (
+                <button onClick={() => { setFilterSearch(''); setFilterStatut('all'); setFilterResp('all'); }} style={{ fontSize: 12, color: '#c0392b', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0' }}>
+                  Réinitialiser
+                </button>
+              )}
             </div>
 
             {/* KPIs */}
@@ -662,6 +686,20 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* FAB + */}
+      {!loading && allData.length > 0 && (
+        <button
+          className="no-print"
+          onClick={openAdd}
+          title="Ajouter une activité"
+          style={{ position: 'fixed', bottom: 28, right: 28, width: 52, height: 52, borderRadius: '50%', background: cfg.color, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 26, fontWeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.22)', zIndex: 50, transition: 'transform .15s, box-shadow .15s', lineHeight: 1 }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.28)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.22)'; }}
+        >
+          +
+        </button>
       )}
 
       {/* TOAST */}
