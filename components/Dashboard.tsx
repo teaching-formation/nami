@@ -56,6 +56,8 @@ export default function Dashboard() {
   const [toast, setToast]             = useState<string | null>(null);
   const [loading, setLoading]         = useState(true);
   const [darkMode, setDarkMode]       = useState(false);
+  const [excelMenu, setExcelMenu]     = useState(false);
+  const excelMenuRef = useRef<HTMLDivElement>(null);
 
   // Modals
   const [editModal,   setEditModal]   = useState<{ open: boolean; mode: 'add'|'edit'; row?: Activite }>({ open: false, mode: 'add' });
@@ -89,6 +91,46 @@ export default function Dashboard() {
     setDarkMode(next);
     document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
     localStorage.setItem('ansut_theme', next ? 'dark' : 'light');
+  }
+
+  // Fermer le menu Excel si clic extérieur
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (excelMenuRef.current && !excelMenuRef.current.contains(e.target as Node)) setExcelMenu(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  function rowsToSheet(rows: Activite[]) {
+    const data = rows.map(r => ({
+      'N°':                         r.numero,
+      'CT / Département / Service': r.type_dept,
+      'Responsable':                r.responsable,
+      'Rubrique':                   r.rubrique,
+      'Activité':                   r.activite,
+      'Statut':                     r.statut ?? '',
+    }));
+    return XLSX.utils.json_to_sheet(data);
+  }
+
+  function exportExcel(mode: 'current' | 'all') {
+    setExcelMenu(false);
+    const wb = XLSX.utils.book_new();
+    const date = new Date().toISOString().slice(0, 10);
+    if (mode === 'current') {
+      XLSX.utils.book_append_sheet(wb, rowsToSheet(filtered), currentDept.slice(0, 31));
+      XLSX.writeFile(wb, `ANSUT_${currentDept.replace(/[^a-z0-9]/gi,'_')}_${date}.xlsx`);
+      showToast(`✓ Export Excel — ${currentDept}`);
+    } else {
+      const deptList = Array.from(new Set(allData.map(r => r.departement))).filter(Boolean);
+      deptList.forEach(dept => {
+        const rows = allData.filter(r => r.departement === dept);
+        XLSX.utils.book_append_sheet(wb, rowsToSheet(rows), dept.slice(0, 31));
+      });
+      XLSX.writeFile(wb, `ANSUT_Tous_departements_${date}.xlsx`);
+      showToast(`✓ Export Excel — ${deptList.length} onglets`);
+    }
   }
 
   function showToast(msg: string) {
@@ -264,6 +306,40 @@ export default function Dashboard() {
             {darkMode ? '☀️' : '🌙'}
           </button>
           <button className="hbtn" onClick={() => window.print()}>⬇ PDF</button>
+
+          {/* Bouton Excel + menu */}
+          <div ref={excelMenuRef} style={{ position: 'relative' }}>
+            <button className="hbtn" onClick={() => setExcelMenu(v => !v)}
+              style={{ background: excelMenu ? 'var(--surface3)' : '' }}>
+              📊 Excel <span style={{ fontSize: 9, opacity: .6 }}>▾</span>
+            </button>
+            {excelMenu && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: 'var(--surface)', border: '1px solid var(--border2)', borderRadius: 8, boxShadow: 'var(--shadow-lg)', minWidth: 200, zIndex: 50, overflow: 'hidden' }}>
+                <button onClick={() => exportExcel('current')}
+                  style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8, transition: 'background .12s', fontFamily: 'var(--font)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span style={{ fontSize: 16 }}>📄</span>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>Onglet actuel</div>
+                    <div style={{ fontSize: 11, color: 'var(--text3)' }}>{currentDept}</div>
+                  </div>
+                </button>
+                <div style={{ borderTop: '1px solid var(--border)' }} />
+                <button onClick={() => exportExcel('all')}
+                  style={{ width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8, transition: 'background .12s', fontFamily: 'var(--font)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span style={{ fontSize: 16 }}>📑</span>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>Tous les onglets</div>
+                    <div style={{ fontSize: 11, color: 'var(--text3)' }}>{depts.length} feuilles dans un seul fichier</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
           <button className="hbtn hbtn-accent" onClick={() => setImportModal(true)}>↑ Import Excel</button>
           <button className="hbtn hbtn-primary" onClick={openAdd}>+ Ajouter</button>
         </div>
