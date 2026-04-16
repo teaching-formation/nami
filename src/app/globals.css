@@ -75,6 +75,23 @@
   --s-na-bg:    rgba(90,86,80,0.12);   --s-na-fg:    #6e7681;
 }
 
+/* ── DARK MODE SYSTÈME (si pas encore défini manuellement) ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0b1120; --bg2:#111827; --surface:#131d2e; --surface2:#182234; --surface3:#1e2a3e;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+    --text:#e2e8f4; --text2:#7f8ea8; --text3:#4d5d78;
+    --primary:#4d8fdf; --primary-hover:#6aa3e8; --primary-light:rgba(77,143,223,0.12);
+    --accent:#F47920; --accent-hover:#f98c38; --accent-light:rgba(244,121,32,0.12);
+    --shadow-sm:0 1px 3px rgba(0,0,0,0.4); --shadow:0 4px 16px rgba(0,0,0,0.45); --shadow-lg:0 8px 32px rgba(0,0,0,0.6);
+    --s-clos-bg:rgba(46,107,14,0.18); --s-clos-fg:#7ec96e;
+    --s-ec-bg:rgba(21,95,160,0.18);   --s-ec-fg:#7ab8f5;
+    --s-ouv-bg:rgba(133,79,11,0.18);  --s-ouv-fg:#f4b05a;
+    --s-nd-bg:rgba(90,86,80,0.18);    --s-nd-fg:#a09a94;
+    --s-na-bg:rgba(90,86,80,0.12);    --s-na-fg:#6e7681;
+  }
+}
+
 /* ── BASE ── */
 body {
   font-family: var(--font);
@@ -395,16 +412,63 @@ body {
   .kpi-grid { grid-template-columns: repeat(2,1fr); }
 }
 
+/* ── RESPONSIVE ≤ 900px : header actions scrollable ── */
+@media (max-width:900px) {
+  .db-header { flex-wrap: wrap; height: auto; padding: 10px 16px 8px; gap: 8px; }
+  .db-header > div:first-child { flex: 1 1 auto; }
+  .db-header-actions {
+    width: 100%; overflow-x: auto; flex-wrap: nowrap;
+    scrollbar-width: none; gap: 6px; padding-bottom: 2px;
+  }
+  .db-header-actions::-webkit-scrollbar { display: none; }
+  .hbtn { padding: 5px 11px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  .dark-toggle { width: 30px; height: 30px; font-size: 14px; flex-shrink: 0; }
+  .dept-tabs { top: 76px; }
+}
+
 /* ── RESPONSIVE MOBILE ≤ 600px ── */
 @media (max-width:600px) {
-  .db-header  { padding: 0 14px; }
+  /* Header : 2 lignes */
+  .db-header {
+    height: auto;
+    padding: 10px 14px 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .db-header::before { height: 2px; }
+
+  /* Logo + titre prennent toute la première ligne */
+  .db-header > div:first-child { flex: 1 1 auto; }
+
+  /* Boutons : scrollable sur une ligne en dessous */
+  .db-header-actions {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+  .db-header-actions::-webkit-scrollbar { display: none; }
+  .hbtn { padding: 5px 10px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+  .dark-toggle { flex-shrink: 0; }
+
+  /* Onglets */
+  .dept-tabs { top: 80px; }
+
+  /* Main */
   .db-main    { padding: 14px 12px; gap: 14px; }
   .kpi-grid   { grid-template-columns: repeat(2,1fr); gap: 10px; }
   .kpi-card-inner { padding: 14px 12px; }
   .kpi-value  { font-size: 22px !important; }
   .mid-row    { gap: 12px; }
   .comment-panel { max-width: 100%; }
-  .db-select  { max-width: 140px; }
+  .db-select  { max-width: 150px; }
+  .db-search input { width: 150px; }
+
+  /* Tableau : masquer colonne commentaires sur très petit */
+  .db-table th:nth-child(5),
+  .db-table td:nth-child(5) { display: none; }
 }
 
 /* ── PRINT / PDF ── */
